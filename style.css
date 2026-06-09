@@ -9,7 +9,6 @@
 @font-face { font-family: 'EuroscriptPro'; src: url('fontls/Euroscript_Pro.otf'); }
 @font-face { font-family: 'LovelyGrace'; src: url('fontls/Lovely_Grace_BG.ttf'); }
 @font-face { font-family: 'ADayWithoutSun'; src: url('fontls/A_Day_Without_Sun.otf'); }
-
 @font-face { font-family: 'AncientKyiv'; src: url('fontls/Ancient_Kyiv.ttf'); }
 @font-face { font-family: 'AAHigherup'; src: url('fontls/AA-Higherup.ttf'); }
 @font-face { font-family: 'AhellyaItalic'; src: url('fontls/Ahellya_Italic.ttf'); }
@@ -147,7 +146,7 @@ body {
     outline: none;
 }
 
-#sizeSlider {
+#sizeSlider, #weightSlider {
     background: rgba(255, 255, 255, 0.1);
 }
 
@@ -183,7 +182,7 @@ body {
 }
 
 .color-picker-panel.open {
-    max-height: 140px;
+    max-height: 200px;
     margin-bottom: 15px;
     opacity: 1;
 }
@@ -245,10 +244,12 @@ body {
     line-height: 1.3;
     margin-bottom: 15px;
     color: #ffffff;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
     word-break: break-word;
     text-align: center;
     padding: 0 15px;
+    transition: filter 0.2s ease; 
+    paint-order: stroke fill;
+    will-change: filter;
 }
 
 .font-name {
