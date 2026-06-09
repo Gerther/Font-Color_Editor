@@ -10,7 +10,6 @@ const fontsData = [
     { name: "Euroscript Pro", fontFamily: "EuroscriptPro", defaultText: "Aa" },
     { name: "Lovely Grace BG", fontFamily: "LovelyGrace", defaultText: "Aa" },
     { name: "A Day Without Sun", fontFamily: "ADayWithoutSun", defaultText: "Aa" },
-    
     { name: "Ancient Kyiv", fontFamily: "AncientKyiv", defaultText: "Aa" },
     { name: "AA Higherup", fontFamily: "AAHigherup", defaultText: "Aa" },
     { name: "Ahellya Italic", fontFamily: "AhellyaItalic", defaultText: "Aa" },
@@ -71,6 +70,8 @@ const fontsData = [
 let currentIndex = 0;
 let currentHue = 0;
 let currentBrightness = 100;
+let currentWeight = 400;
+let currentSpacing = 0;
 let currentAlignment = 'center';
 let generatedDataUrl = null; 
 
@@ -89,6 +90,10 @@ const colorPanel = document.getElementById('colorPanel');
 const colorSlider = document.getElementById('colorSlider');
 const brightnessSlider = document.getElementById('brightnessSlider');
 const brightLabel = document.getElementById('brightLabel');
+const weightSlider = document.getElementById('weightSlider');
+const weightLabel = document.getElementById('weightLabel');
+const spacingSlider = document.getElementById('spacingSlider');
+const spacingLabel = document.getElementById('spacingLabel');
 const indicator = document.getElementById('indicator');
 
 const searchBtn = document.getElementById('searchBtn');
@@ -117,6 +122,32 @@ function updateTextColor() {
     fontPreview.style.color = hslColor;
     indicator.style.backgroundColor = hslColor;
     brightnessSlider.style.background = `linear-gradient(to right, #000000, hsl(${currentHue}, 100%, 50%), #ffffff)`;
+
+    
+    fontPreview.style.textShadow = 'none';
+    
+    fontPreview.style.filter = `
+        drop-shadow(0px 0px 3px #474646) 
+        drop-shadow(0px 0px 8px rgba(114, 114, 114, 0.9)) 
+        drop-shadow(0px 0px 20px rgba(104, 104, 104, 0.7)) 
+        drop-shadow(0px 0px 45px rgba(255, 255, 255, 0.5))
+    `;
+}
+
+function updateWeightDOM() {
+    const weightValue = parseInt(currentWeight);
+    const userSize = parseInt(sizeSlider.value);
+    
+    if (weightValue > 400) {
+        const strokeWidth = userSize * ((weightValue - 400) / 500) * 0.04;
+        fontPreview.style.webkitTextStroke = `${strokeWidth}px currentColor`;
+        fontPreview.style.fontWeight = 'normal'; 
+    } else {
+        fontPreview.style.webkitTextStroke = '0px transparent';
+        fontPreview.style.fontWeight = 'normal';
+    }
+
+    updateTextColor();
 }
 
 searchBtn.addEventListener('click', () => {
@@ -176,10 +207,23 @@ brightnessSlider.addEventListener('input', (e) => {
     updateTextColor();
 });
 
+weightSlider.addEventListener('input', (e) => {
+    currentWeight = e.target.value;
+    weightLabel.textContent = currentWeight;
+    updateWeightDOM();
+});
+
+spacingSlider.addEventListener('input', (e) => {
+    currentSpacing = e.target.value;
+    spacingLabel.textContent = `${currentSpacing}px`;
+    fontPreview.style.letterSpacing = `${currentSpacing}px`;
+});
+
 sizeSlider.addEventListener('input', (e) => {
     const currentSize = e.target.value;
     fontPreview.style.fontSize = `${currentSize}px`;
     sizeLabel.textContent = `${currentSize}px`;
+    updateWeightDOM();
 });
 
 textInput.addEventListener('input', () => {
@@ -205,6 +249,32 @@ nextBtn.addEventListener('click', () => {
     updateSlider(currentIndex);
 });
 
+function wrapText(ctx, text, maxWidth) {
+    const lines = [];
+    const paragraphs = text.split('\n');
+    
+    paragraphs.forEach(paragraph => {
+        const words = paragraph.split(' ');
+        let currentLine = '';
+
+        for (let n = 0; n < words.length; n++) {
+            let testLine = currentLine + (currentLine ? ' ' : '') + words[n];
+            let metrics = ctx.measureText(testLine);
+            
+            if (metrics.width > maxWidth && n > 0) {
+                lines.push(currentLine);
+                currentLine = words[n];
+            } else {
+                currentLine = testLine;
+            }
+        }
+        if (currentLine) {
+            lines.push(currentLine);
+        }
+    });
+    return lines;
+}
+
 applyBtn.addEventListener('click', () => {
     const textToRender = fontPreview.textContent;
     const activeFont = fontsData[currentIndex];
@@ -225,44 +295,13 @@ applyBtn.addEventListener('click', () => {
         const testCanvas = document.createElement('canvas');
         const testCtx = testCanvas.getContext('2d');
         const fontSize = userSize * scaleFactor;
-        testCtx.font = `${fontSize}px "${activeFont.fontFamily}"`;
-
+        const scaledSpacing = currentSpacing * scaleFactor;
+        
+        testCtx.font = `normal ${fontSize}px "${activeFont.fontFamily}"`;
+        testCtx.letterSpacing = `${scaledSpacing}px`;
         const maxCanvasTextWidth = previewTextWidth * scaleFactor;
 
-        const lines = [];
-        const paragraphs = textToRender.split('\n');
-
-        paragraphs.forEach(paragraph => {
-            const words = paragraph.split(' ');
-            let currentLine = '';
-
-            words.forEach(word => {
-                let testLine = currentLine + (currentLine ? ' ' : '') + word;
-                let metrics = testCtx.measureText(testLine);
-
-                if (metrics.width <= maxCanvasTextWidth) {
-                    currentLine = testLine;
-                } else {
-                    if (testCtx.measureText(word).width > maxCanvasTextWidth) {
-                        for (let i = 0; i < word.length; i++) {
-                            let char = word[i];
-                            let testCharLine = currentLine + (currentLine && i === 0 ? ' ' : '') + char;
-                            
-                            if (testCtx.measureText(testCharLine).width <= maxCanvasTextWidth) {
-                                currentLine = testCharLine;
-                            } else {
-                                if (currentLine) lines.push(currentLine);
-                                currentLine = char;
-                            }
-                        }
-                    } else {
-                        if (currentLine) lines.push(currentLine);
-                        currentLine = word;
-                    }
-                }
-            });
-            if (currentLine) lines.push(currentLine);
-        });
+        const lines = wrapText(testCtx, textToRender, maxCanvasTextWidth);
 
         const lineHeight = fontSize * 1.5;
         const bottomBuffer = fontSize * 0.8; 
@@ -275,9 +314,23 @@ applyBtn.addEventListener('click', () => {
         canvas.height = totalTextHeight + (canvasPadding * 2);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.font = `${fontSize}px "${activeFont.fontFamily}"`;
+        ctx.shadowColor = "transparent";
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+        ctx.font = `normal ${fontSize}px "${activeFont.fontFamily}"`;
+        ctx.letterSpacing = `${scaledSpacing}px`;
         ctx.fillStyle = `hsl(${currentHue}, 100%, ${currentBrightness}%)`;
         ctx.textBaseline = 'top'; 
+
+        const weightValue = parseInt(currentWeight);
+        if (weightValue > 400) {
+            ctx.strokeStyle = ctx.fillStyle;
+            ctx.lineWidth = fontSize * ((weightValue - 400) / 500) * 0.04;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+        }
 
         let xPos = canvasPadding;
         if (currentAlignment === 'center') {
@@ -292,6 +345,9 @@ applyBtn.addEventListener('click', () => {
 
         let yPos = canvasPadding;
         lines.forEach(line => {
+            if (weightValue > 400) {
+                ctx.strokeText(line, xPos, yPos);
+            }
             ctx.fillText(line, xPos, yPos);
             yPos += lineHeight;
         });
@@ -310,14 +366,19 @@ applyBtn.addEventListener('click', () => {
             previewImg.style.borderRadius = '10px';
             previewImg.style.marginBottom = '15px';
             previewImg.style.border = '1px dashed rgba(255,255,255,0.3)';
-            previewImg.style.backgroundColor = 'rgba(0,0,0,0.2)';
             modalBox.insertBefore(previewImg, confirmDownloadBtn);
         }
         previewImg.src = generatedDataUrl;
 
-        const textDesc = modalBox.querySelector('p');
+        if (parseInt(currentBrightness) < 30) {
+            previewImg.style.backgroundColor = '#ffffff';
+        } else {
+            previewImg.style.backgroundColor = 'rgba(0,0,0,0.2)'; 
+        }
+
+        const textDesc = modalBox.querySelector('p') || Array.from(modalBox.querySelectorAll('div, p, span')).find(el => el.textContent.includes('качест') || el.textContent.includes('x5') || el.textContent.includes('х5'));
         if (textDesc) {
-            textDesc.innerHTML = 'Нажмите «Скачать PNG».<br><strong style="color: #ffcc00; display: block; margin-top: 8px; font-size: 13px;">Если кнопка не работает (iPhone/Google chrome) — попробуйте другой браузер (Safari) или просто зажмите картинку ниже пальцем и выберите «Сохранить в Фото».</strong>';
+            textDesc.innerHTML = 'Нажмите «Скачать PNG».<br><strong style="color: #ffcc00; display: block; margin-top: 8px; font-size: 13px;">Если кнопка не работает (iPhone/Google chrome) — попробуйте другой browser (Safari) или просто зажмите картинку ниже пальцем и выберите «Сохранить в Фото».</strong>';
         }
 
         downloadModal.style.display = 'flex';
@@ -346,3 +407,4 @@ confirmDownloadBtn.addEventListener('click', (e) => {
 
 updateSlider(currentIndex);
 updateTextColor();
+updateWeightDOM();
