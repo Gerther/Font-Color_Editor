@@ -86,13 +86,8 @@ const nextBtn = document.getElementById('nextBtn');
 const applyBtn = document.getElementById('applyBtn');
 const alignButtons = document.querySelectorAll('.align-btn');
 
-const menuBtn = document.getElementById('menuBtn');
-const menuPanel = document.getElementById('menuPanel');
-const btnColorMenu = document.getElementById('btnColorMenu');
-const btnWeightMenu = document.getElementById('btnWeightMenu');
-const btnSpacingMenu = document.getElementById('btnSpacingMenu');
-const subPanels = document.querySelectorAll('.sub-panel');
-
+const paletteBtn = document.getElementById('paletteBtn');
+const colorPanel = document.getElementById('colorPanel');
 const colorSlider = document.getElementById('colorSlider');
 const brightnessSlider = document.getElementById('brightnessSlider');
 const brightLabel = document.getElementById('brightLabel');
@@ -157,43 +152,10 @@ function updateWeightDOM() {
     updateTextColor();
 }
 
-menuBtn.addEventListener('click', () => {
-    menuBtn.classList.toggle('active');
-    menuPanel.classList.toggle('open');
-    if (menuPanel.classList.contains('open')) {
-        searchBtn.classList.remove('active');
-        searchPanel.classList.remove('open');
-    } else {
-        subPanels.forEach(p => p.classList.remove('open'));
-        document.querySelectorAll('.menu-item-btn').forEach(b => b.classList.remove('active'));
-    }
-});
-
-function toggleSubPanel(panelId, btn) {
-    const panel = document.getElementById(panelId);
-    const isOpen = panel.classList.contains('open');
-
-    subPanels.forEach(p => p.classList.remove('open'));
-    document.querySelectorAll('.menu-item-btn').forEach(b => b.classList.remove('active'));
-
-    if (!isOpen) {
-        panel.classList.add('open');
-        btn.classList.add('active');
-    }
-}
-
-btnColorMenu.addEventListener('click', () => toggleSubPanel('colorSubPanel', btnColorMenu));
-btnWeightMenu.addEventListener('click', () => toggleSubPanel('weightSubPanel', btnWeightMenu));
-btnSpacingMenu.addEventListener('click', () => toggleSubPanel('spacingSubPanel', btnSpacingMenu));
-
 searchBtn.addEventListener('click', () => {
     searchBtn.classList.toggle('active');
     searchPanel.classList.toggle('open');
     if (searchPanel.classList.contains('open')) {
-        menuBtn.classList.remove('active');
-        menuPanel.classList.remove('open');
-        subPanels.forEach(p => p.classList.remove('open'));
-        document.querySelectorAll('.menu-item-btn').forEach(b => b.classList.remove('active'));
         fontSearchInput.value = '';
         renderSearchResults('');
         fontSearchInput.focus();
@@ -230,6 +192,11 @@ function renderSearchResults(query) {
         searchResults.appendChild(item);
     });
 }
+
+paletteBtn.addEventListener('click', () => {
+    paletteBtn.classList.toggle('active');
+    colorPanel.classList.toggle('open');
+});
 
 colorSlider.addEventListener('input', (e) => {
     currentHue = e.target.value;
