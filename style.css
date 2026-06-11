@@ -146,7 +146,7 @@ body {
     outline: none;
 }
 
-#sizeSlider, #weightSlider {
+#sizeSlider, #weightSlider, #spacingSlider, #lineHeightSlider {
     background: rgba(255, 255, 255, 0.1);
 }
 
@@ -182,7 +182,7 @@ body {
 }
 
 .color-picker-panel.open {
-    max-height: 200px;
+    max-height: 350px;
     margin-bottom: 15px;
     opacity: 1;
 }
