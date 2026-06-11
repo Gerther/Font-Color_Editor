@@ -72,6 +72,7 @@ let currentHue = 0;
 let currentBrightness = 100;
 let currentWeight = 400;
 let currentSpacing = 0;
+let currentLineHeight = 1.3;
 let currentAlignment = 'center';
 let generatedDataUrl = null; 
 
@@ -94,6 +95,8 @@ const weightSlider = document.getElementById('weightSlider');
 const weightLabel = document.getElementById('weightLabel');
 const spacingSlider = document.getElementById('spacingSlider');
 const spacingLabel = document.getElementById('spacingLabel');
+const lineHeightSlider = document.getElementById('lineHeightSlider');
+const lineHeightLabel = document.getElementById('lineHeightLabel');
 const indicator = document.getElementById('indicator');
 
 const searchBtn = document.getElementById('searchBtn');
@@ -123,7 +126,6 @@ function updateTextColor() {
     indicator.style.backgroundColor = hslColor;
     brightnessSlider.style.background = `linear-gradient(to right, #000000, hsl(${currentHue}, 100%, 50%), #ffffff)`;
 
-    
     fontPreview.style.textShadow = 'none';
     
     fontPreview.style.filter = `
@@ -219,6 +221,12 @@ spacingSlider.addEventListener('input', (e) => {
     fontPreview.style.letterSpacing = `${currentSpacing}px`;
 });
 
+lineHeightSlider.addEventListener('input', (e) => {
+    currentLineHeight = parseFloat(e.target.value);
+    lineHeightLabel.textContent = currentLineHeight;
+    fontPreview.style.lineHeight = currentLineHeight;
+});
+
 sizeSlider.addEventListener('input', (e) => {
     const currentSize = e.target.value;
     fontPreview.style.fontSize = `${currentSize}px`;
@@ -303,8 +311,8 @@ applyBtn.addEventListener('click', () => {
 
         const lines = wrapText(testCtx, textToRender, maxCanvasTextWidth);
 
-        const lineHeight = fontSize * 1.5;
-        const bottomBuffer = fontSize * 0.8; 
+        const lineHeight = fontSize * currentLineHeight;
+        const bottomBuffer = fontSize * 0.1; 
         const totalTextHeight = (lines.length * lineHeight) + bottomBuffer;
 
         const canvas = document.createElement('canvas');
