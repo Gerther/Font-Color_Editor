@@ -27,54 +27,31 @@
             <div class="search-results" id="searchResults"></div>
         </div>
 
-        <div class="menu-panel-container" id="menuPanel">
-            <div class="menu-grid">
-                <button class="menu-item-btn" id="btnColorMenu">
-                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-10 10c0 5.523 4.477 10 10 10a1 1 0 0 0 1-1v-1.5a2.5 2.5 0 0 1 2.5-2.5H19a3 3 0 0 0 3-3c0-6.627-4.477-11-10-11zm-5.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm4.5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3.5 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
-                    <span>Цвет</span>
-                </button>
-                <button class="menu-item-btn" id="btnWeightMenu">
-                    <svg viewBox="0 0 24 24"><path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>
-                    <span>Жирность</span>
-                </button>
-                <button class="menu-item-btn" id="btnSpacingMenu">
-                    <svg viewBox="0 0 24 24"><path d="M6 7h2.5L5 3.5 1.5 7H4v10H1.5L5 20.5 8.5 17H6V7zm4-2v2h12V5H10zm0 14h12v-2H10v2zm0-6h12v-2H10v2z"/></svg>
-                    <span>Интервалы</span>
-                </button>
+        <div class="color-picker-panel" id="colorPanel">
+            <div class="control-box">
+                <span class="control-label">Цвет</span>
+                <input type="range" id="colorSlider" class="range-slider" min="0" max="360" value="0">
+                <span class="control-label" style="min-width:20px; text-align:right;"><span class="color-indicator" id="indicator"></span></span>
             </div>
-            
-            <div class="sub-panel" id="colorSubPanel">
-                <div class="control-box">
-                    <span class="control-label">Цвет</span>
-                    <input type="range" id="colorSlider" class="range-slider" min="0" max="360" value="0">
-                    <span class="control-label" style="min-width:20px; text-align:right;"><span class="color-indicator" id="indicator"></span></span>
-                </div>
-                <div class="control-box">
-                    <span class="control-label">Яркость</span>
-                    <input type="range" id="brightnessSlider" class="range-slider" min="0" max="100" value="100">
-                    <span class="control-label" id="brightLabel" style="min-width:35px; text-align:right;">100%</span>
-                </div>
+            <div class="control-box">
+                <span class="control-label">Яркость</span>
+                <input type="range" id="brightnessSlider" class="range-slider" min="0" max="100" value="100">
+                <span class="control-label" id="brightLabel" style="min-width:35px; text-align:right;">100%</span>
             </div>
-            
-            <div class="sub-panel" id="weightSubPanel">
-                <div class="control-box" id="weightBox">
-                    <span class="control-label">Жирность</span>
-                    <input type="range" id="weightSlider" class="range-slider" min="100" max="900" step="1" value="400">
-                    <span class="control-label" id="weightLabel" style="min-width:35px; text-align:right;">400</span>
-                </div>
+            <div class="control-box" id="weightBox">
+                <span class="control-label">Жирность</span>
+                <input type="range" id="weightSlider" class="range-slider" min="100" max="900" step="1" value="400">
+                <span class="control-label" id="weightLabel" style="min-width:35px; text-align:right;">400</span>
             </div>
-            
-            <div class="sub-panel" id="spacingSubPanel">
-                <div class="control-box" id="spacingBox">
-                    <span class="control-label">Символы</span>
-                    <input type="range" id="spacingSlider" class="range-slider" min="-10" max="50" step="1" value="0">
-                    <span class="control-label" id="spacingLabel" style="min-width:35px; text-align:right;">0px</span>
-                </div>
-                <div class="control-box" id="lineHeightBox">
-                    <span class="control-label">Строки</span>
-                    <input type="range" id="lineHeightSlider" class="range-slider" min="0.1" max="3.5" step="0.05" value="1.3">
-                    <span class="control-label" id="lineHeightLabel" style="min-width:35px; text-align:right;">1.3</span>
-                </div>
+            <div class="control-box" id="spacingBox">
+                <span class="control-label">Межбуквенный интервал</span>
+                <input type="range" id="spacingSlider" class="range-slider" min="-10" max="50" step="1" value="0">
+                <span class="control-label" id="spacingLabel" style="min-width:35px; text-align:right;">0px</span>
+            </div>
+            <div class="control-box" id="lineHeightBox">
+                <span class="control-label">Межстрочный интервал</span>
+                <input type="range" id="lineHeightSlider" class="range-slider" min="0.1" max="3.5" step="0.1" value="1.3">
+                <span class="control-label" id="lineHeightLabel" style="min-width:35px; text-align:right;">1.3</span>
             </div>
         </div>
 
@@ -97,18 +74,8 @@
                     <svg viewBox="0 0 24 24"><path d="M3 15h18v2H3zm6-4h12v2H9zm-6-4h18v2H3zm6 12h12v2H9z"/></svg>
                 </button>
                 
-                <button class="menu-btn" id="menuBtn">
-                    <svg viewBox="0 0 24 24">
-                        <rect x="4" y="4" width="4" height="4" rx="1"/>
-                        <rect x="10" y="4" width="4" height="4" rx="1"/>
-                        <rect x="16" y="4" width="4" height="4" rx="1"/>
-                        <rect x="4" y="10" width="4" height="4" rx="1"/>
-                        <rect x="10" y="10" width="4" height="4" rx="1"/>
-                        <rect x="16" y="10" width="4" height="4" rx="1"/>
-                        <rect x="4" y="16" width="4" height="4" rx="1"/>
-                        <rect x="10" y="16" width="4" height="4" rx="1"/>
-                        <rect x="16" y="16" width="4" height="4" rx="1"/>
-                    </svg>
+                <button class="palette-btn" id="paletteBtn">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-10 10c0 5.523 4.477 10 10 10a1 1 0 0 0 1-1v-1.5a2.5 2.5 0 0 1 2.5-2.5H19a3 3 0 0 0 3-3c0-6.627-4.477-11-10-11zm-5.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm4.5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3.5 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
                 </button>
 
                 <button class="search-btn" id="searchBtn">
@@ -142,7 +109,7 @@
     <div id="downloadModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 9, 20, 0.95); z-index: 10000; justify-content: center; align-items: center; padding: 20px;">
         <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 24px; border-radius: 24px; max-width: 340px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); backdrop-filter: blur(10px);">
             <h3 style="margin-bottom: 12px; font-size: 18px; font-weight: 600;">Готово!</h3>
-            <p style="font-size: 14px; color: #8a8a9e; margin-bottom: 20px;">Нажмите кнопку ниже, чтобы сохранить прозрачный PNG.</p>
+            <p style="font-size: 14px; color: #8a8a9e; margin-bottom: 20px;">Нажмите кнопку ниже, чтобы сохранить прозрачный PNG в х5 качестве.</p>
             <a id="confirmDownloadBtn" href="#" download="text_preview.png" style="display: block; width: 100%; padding: 14px; background: #ffffff; color: #0b0914; border-radius: 14px; text-decoration: none; font-weight: 600; font-size: 15px; margin-bottom: 10px; transition: background 0.2s;">Скачать PNG</a>
             <button id="closeModalBtn" style="width: 100%; padding: 12px; background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #ffffff; border-radius: 14px; font-size: 14px; cursor: pointer;">Закрыть</button>
         </div>
