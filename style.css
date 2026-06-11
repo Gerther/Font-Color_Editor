@@ -174,97 +174,27 @@ body {
     background: linear-gradient(to right, #000000, #ffffff);
 }
 
-.menu-panel-container {
+.color-picker-panel {
     max-height: 0;
     overflow: hidden;
+    transition: max-height 0.3s ease-out, margin 0.3s ease-out;
     opacity: 0;
-    margin-bottom: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    transition: max-height 0.45s cubic-bezier(0.33, 1, 0.68, 1), 
-                margin-bottom 0.45s cubic-bezier(0.33, 1, 0.68, 1), 
-                opacity 0.3s ease-in-out;
 }
 
-.menu-panel-container.open {
-    max-height: 600px;
+.color-picker-panel.open {
+    max-height: 350px;
     margin-bottom: 15px;
     opacity: 1;
-}
-
-.menu-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-}
-
-.menu-item-btn {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
-    padding: 16px 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    color: #8a8a9e;
-    transition: all 0.2s;
-}
-
-.menu-item-btn svg {
-    width: 24px;
-    height: 24px;
-    fill: currentColor;
-}
-
-.menu-item-btn span {
-    font-size: 13px;
-    font-weight: 500;
-}
-
-.menu-item-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-}
-
-.menu-item-btn.active {
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-.sub-panel {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.4s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.3s ease-out;
-    display: flex;
-    flex-direction: column;
-}
-
-.sub-panel.open {
-    max-height: 250px;
-    opacity: 1;
-}
-
-.sub-panel .control-box:last-child {
-    margin-bottom: 0;
 }
 
 .search-panel {
     max-height: 0;
     overflow: hidden;
+    transition: max-height 0.3s ease-out, margin 0.3s ease-out;
     opacity: 0;
-    margin-bottom: 0;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    transition: max-height 0.45s cubic-bezier(0.33, 1, 0.68, 1), 
-                margin-bottom 0.45s cubic-bezier(0.33, 1, 0.68, 1), 
-                opacity 0.3s ease-in-out;
 }
 
 .search-panel.open {
@@ -346,7 +276,7 @@ body {
     flex: 1;
 }
 
-.align-btn, .menu-btn, .search-btn, .nav-btn {
+.align-btn, .palette-btn, .search-btn, .nav-btn {
     height: 40px;
     background: transparent;
     border: none;
@@ -367,21 +297,17 @@ body {
     color: #ffffff;
 }
 
-.align-btn svg, .menu-btn svg, .search-btn svg {
+.align-btn svg, .palette-btn svg, .search-btn svg {
     width: 18px;
     height: 18px;
     display: block;
 }
 
-.align-btn svg path, .search-btn svg path {
+.align-btn svg path, .palette-btn svg path, .search-btn svg path {
     fill: currentColor;
 }
 
-.menu-btn svg rect {
-    fill: currentColor;
-}
-
-.align-btn.active, .menu-btn.active, .search-btn.active {
+.align-btn.active, .palette-btn.active, .search-btn.active {
     background: rgba(255, 255, 255, 0.08);
     color: #ffffff;
 }
@@ -400,7 +326,7 @@ body {
     gap: 4px;
 }
 
-.nav-btn:active, .align-btn:active, .menu-btn:active, .search-btn:active {
+.nav-btn:active, .align-btn:active, .palette-btn:active, .search-btn:active {
     transform: scale(0.95);
 }
 
@@ -512,7 +438,7 @@ body {
 
 @media (hover: hover) {
     .nav-btn:hover { background: rgba(255, 255, 255, 0.1); }
-    .align-btn:hover, .menu-btn:hover, .search-btn:hover { color: #fff; }
+    .align-btn:hover, .palette-btn:hover, .search-btn:hover { color: #fff; }
     .action-btn:hover { background: #f0f0f0; }
 }
 
