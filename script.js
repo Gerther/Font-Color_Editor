@@ -86,8 +86,13 @@ const nextBtn = document.getElementById('nextBtn');
 const applyBtn = document.getElementById('applyBtn');
 const alignButtons = document.querySelectorAll('.align-btn');
 
-const paletteBtn = document.getElementById('paletteBtn');
-const colorPanel = document.getElementById('colorPanel');
+const menuToggleBtn = document.getElementById('menuToggleBtn');
+const menuWrapper = document.getElementById('menuWrapper');
+const menuGrid = document.getElementById('menuGrid');
+const subPanels = document.querySelectorAll('.sub-panel');
+const menuTiles = document.querySelectorAll('.menu-tile');
+const backBtns = document.querySelectorAll('.back-btn');
+
 const colorSlider = document.getElementById('colorSlider');
 const brightnessSlider = document.getElementById('brightnessSlider');
 const brightLabel = document.getElementById('brightLabel');
@@ -152,10 +157,41 @@ function updateWeightDOM() {
     updateTextColor();
 }
 
+menuToggleBtn.addEventListener('click', () => {
+    menuToggleBtn.classList.toggle('active');
+    menuWrapper.classList.toggle('open');
+    if (menuWrapper.classList.contains('open')) {
+        searchBtn.classList.remove('active');
+        searchPanel.classList.remove('open');
+    } else {
+        setTimeout(() => {
+            subPanels.forEach(p => p.classList.remove('active'));
+            menuGrid.style.display = 'grid';
+        }, 300);
+    }
+});
+
+menuTiles.forEach(tile => {
+    tile.addEventListener('click', () => {
+        const targetId = tile.getAttribute('data-target');
+        menuGrid.style.display = 'none';
+        document.getElementById(targetId).classList.add('active');
+    });
+});
+
+backBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        subPanels.forEach(p => p.classList.remove('active'));
+        menuGrid.style.display = 'grid';
+    });
+});
+
 searchBtn.addEventListener('click', () => {
     searchBtn.classList.toggle('active');
     searchPanel.classList.toggle('open');
     if (searchPanel.classList.contains('open')) {
+        menuToggleBtn.classList.remove('active');
+        menuWrapper.classList.remove('open');
         fontSearchInput.value = '';
         renderSearchResults('');
         fontSearchInput.focus();
@@ -192,11 +228,6 @@ function renderSearchResults(query) {
         searchResults.appendChild(item);
     });
 }
-
-paletteBtn.addEventListener('click', () => {
-    paletteBtn.classList.toggle('active');
-    colorPanel.classList.toggle('open');
-});
 
 colorSlider.addEventListener('input', (e) => {
     currentHue = e.target.value;
