@@ -75,6 +75,9 @@ const translations = {
         searchPlaceholder: "Font name...",
         color: "Color",
         weight: "Weight",
+        outline: "Outline",
+        skew: "Skew",
+        thickness: "Thickness",
         spacing: "Spacing",
         brightness: "Brightness",
         letterSpacing: "Letter",
@@ -97,6 +100,9 @@ const translations = {
         searchPlaceholder: "Название шрифта...",
         color: "Цвет",
         weight: "Жирность",
+        outline: "Обводка",
+        skew: "Наклон",
+        thickness: "Толщина",
         spacing: "Интервалы",
         brightness: "Яркость",
         letterSpacing: "Межбуквенный",
@@ -119,6 +125,9 @@ const translations = {
         searchPlaceholder: "Назва шрифту...",
         color: "Колір",
         weight: "Жирність",
+        outline: "Обведення",
+        skew: "Нахил",
+        thickness: "Товщина",
         spacing: "Інтервали",
         brightness: "Яскравість",
         letterSpacing: "Міжбуквений",
@@ -143,12 +152,17 @@ let currentBrightness = 100;
 let currentWeight = 450;
 let currentSpacing = 0;
 let currentLineHeight = 1.3;
+let currentSkew = 0;
 let currentAlignment = 'center';
 
 let glowHue = 0;
 let glowBrightness = 100;
 let glowOpacity = 70; 
 let glowSize = 40; 
+
+let outlineThickness = 0;
+let outlineHue = 0;
+let outlineBrightness = 0;
 
 let generatedDataUrl = null; 
 
@@ -178,6 +192,8 @@ const spacingSlider = document.getElementById('spacingSlider');
 const spacingLabel = document.getElementById('spacingLabel');
 const lineHeightSlider = document.getElementById('lineHeightSlider');
 const lineHeightLabel = document.getElementById('lineHeightLabel');
+const skewSlider = document.getElementById('skewSlider');
+const skewLabel = document.getElementById('skewLabel');
 const indicator = document.getElementById('indicator');
 
 const glowColorSlider = document.getElementById('glowColorSlider');
@@ -189,6 +205,13 @@ const glowBrightLabel = document.getElementById('glowBrightLabel');
 const glowOpacityLabel = document.getElementById('glowOpacityLabel');
 const glowSizeLabel = document.getElementById('glowSizeLabel');
 
+const outlineThicknessSlider = document.getElementById('outlineThicknessSlider');
+const outlineThicknessLabel = document.getElementById('outlineThicknessLabel');
+const outlineColorSlider = document.getElementById('outlineColorSlider');
+const outlineBrightnessSlider = document.getElementById('outlineBrightnessSlider');
+const outlineIndicator = document.getElementById('outlineIndicator');
+const outlineBrightLabel = document.getElementById('outlineBrightLabel');
+
 const searchBtn = document.getElementById('searchBtn');
 const searchPanel = document.getElementById('searchPanel');
 const fontSearchInput = document.getElementById('fontSearchInput');
@@ -198,7 +221,7 @@ const downloadModal = document.getElementById('downloadModal');
 const confirmDownloadBtn = document.getElementById('confirmDownloadBtn');
 const closeModalBtn = document.getElementById('closeModalBtn');
 
-const MY_SITE = 'https://skibii323-web.github.io/qwsx/';
+const MY_SITE = 'https://gerther.github.io/Font-Color_Editor/';
 const authContainer = document.getElementById('authContainer');
 
 const langDropdown = document.getElementById('langDropdown');
@@ -333,22 +356,37 @@ function updateTextColor() {
     brightnessSlider.style.background = `linear-gradient(to right, #000000, hsl(${currentHue}, 100%, 50%), #ffffff)`;
 
     updateGlowDOM();
+    updateStrokeDOM();
 }
 
-function updateWeightDOM() {
+function updateStrokeDOM() {
     const weightValue = parseInt(currentWeight);
     const userSize = parseInt(sizeSlider.value);
     
+    let strokeWidth = 0;
+    let strokeColor = 'transparent';
+
+    let baseWeightStroke = 0;
     if (weightValue > 400) {
-        const strokeWidth = userSize * ((weightValue - 400) / 500) * 0.04;
-        fontPreview.style.webkitTextStroke = `${strokeWidth}px currentColor`;
-        fontPreview.style.fontWeight = 'normal'; 
-    } else {
-        fontPreview.style.webkitTextStroke = '0px transparent';
-        fontPreview.style.fontWeight = 'normal';
+        baseWeightStroke = userSize * ((weightValue - 400) / 500) * 0.04;
     }
 
-    updateTextColor();
+    if (outlineThickness > 0) {
+        strokeWidth = parseInt(outlineThickness) + baseWeightStroke;
+        strokeColor = `hsl(${outlineHue}, 100%, ${outlineBrightness}%)`;
+    } else if (baseWeightStroke > 0) {
+        strokeWidth = baseWeightStroke;
+        strokeColor = `hsl(${currentHue}, 100%, ${currentBrightness}%)`;
+    }
+
+    fontPreview.style.webkitTextStroke = `${strokeWidth}px ${strokeColor}`;
+    fontPreview.style.fontWeight = 'normal';
+
+    const outHsl = `hsl(${outlineHue}, 100%, ${outlineBrightness}%)`;
+    if (outlineIndicator && outlineBrightnessSlider) {
+        outlineIndicator.style.backgroundColor = outHsl;
+        outlineBrightnessSlider.style.background = `linear-gradient(to right, #000000, hsl(${outlineHue}, 100%, 50%), #ffffff)`;
+    }
 }
 
 function updateGlowDOM() {
@@ -372,7 +410,6 @@ function updateGlowDOM() {
     let shadows = [];
     
     shadows.push(`0px 0px ${blurMax * 0.15}px ${c}`);
-    
     shadows.push(`0px 0px ${blurMax * 0.4}px ${c}`);
     shadows.push(`0px 0px ${blurMax * 0.7}px ${c}`);
     
@@ -489,10 +526,27 @@ glowSizeSlider.addEventListener('input', (e) => {
     updateGlowDOM();
 });
 
+outlineThicknessSlider.addEventListener('input', (e) => {
+    outlineThickness = e.target.value;
+    outlineThicknessLabel.textContent = `${outlineThickness}px`;
+    updateStrokeDOM();
+});
+
+outlineColorSlider.addEventListener('input', (e) => {
+    outlineHue = e.target.value;
+    updateStrokeDOM();
+});
+
+outlineBrightnessSlider.addEventListener('input', (e) => {
+    outlineBrightness = e.target.value;
+    outlineBrightLabel.textContent = `${outlineBrightness}%`;
+    updateStrokeDOM();
+});
+
 weightSlider.addEventListener('input', (e) => {
     currentWeight = e.target.value;
     weightLabel.textContent = currentWeight;
-    updateWeightDOM();
+    updateStrokeDOM();
 });
 
 spacingSlider.addEventListener('input', (e) => {
@@ -507,11 +561,17 @@ lineHeightSlider.addEventListener('input', (e) => {
     fontPreview.style.lineHeight = currentLineHeight;
 });
 
+skewSlider.addEventListener('input', (e) => {
+    currentSkew = e.target.value;
+    skewLabel.textContent = `${currentSkew}°`;
+    fontPreview.style.transform = `skewX(${-currentSkew}deg)`;
+});
+
 sizeSlider.addEventListener('input', (e) => {
     const currentSize = e.target.value;
     fontPreview.style.fontSize = `${currentSize}px`;
     sizeLabel.textContent = `${currentSize}px`;
-    updateWeightDOM();
+    updateStrokeDOM();
 });
 
 textInput.addEventListener('input', () => {
@@ -567,18 +627,12 @@ applyBtn.addEventListener('click', () => {
     const textToRender = fontPreview.textContent;
     const activeFont = fontsData[currentIndex];
     const userSize = parseInt(sizeSlider.value);
+    const weightValue = parseInt(currentWeight);
     
     const scaleFactor = 5; 
-    const maxGlowBlurCanvas = parseInt(glowSize) * 2.0 * scaleFactor;
-    const extraMarginCanvas = 15 * scaleFactor; 
-    const dynamicPadding = maxGlowBlurCanvas + extraMarginCanvas;
-
-    const previewRect = fontPreview.getBoundingClientRect();
-    const computedStyle = window.getComputedStyle(fontPreview);
     
-    const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
-    const paddingRight = parseFloat(computedStyle.paddingRight) || 0;
-    const previewTextWidth = previewRect.width - paddingLeft - paddingRight;
+    const skewRad = -currentSkew * Math.PI / 180;
+    const skewTan = Math.tan(skewRad);
 
     document.fonts.ready.then(() => {
         const testCanvas = document.createElement('canvas');
@@ -588,6 +642,12 @@ applyBtn.addEventListener('click', () => {
         
         testCtx.font = `normal ${fontSize}px "${activeFont.fontFamily}"`;
         testCtx.letterSpacing = `${scaledSpacing}px`;
+
+        const previewRect = fontPreview.getBoundingClientRect();
+        const computedStyle = window.getComputedStyle(fontPreview);
+        const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
+        const paddingRight = parseFloat(computedStyle.paddingRight) || 0;
+        const previewTextWidth = previewRect.width - paddingLeft - paddingRight;
         const maxCanvasTextWidth = previewTextWidth * scaleFactor;
 
         const lines = wrapText(testCtx, textToRender, maxCanvasTextWidth);
@@ -604,6 +664,12 @@ applyBtn.addEventListener('click', () => {
         const bottomBuffer = fontSize * 0.2;
         const totalTextHeight = (lines.length * lineHeight) + bottomBuffer;
 
+        const maxGlowBlurCanvas = parseInt(glowSize) * 2.0 * scaleFactor;
+        const maxOutlineCanvas = parseInt(outlineThickness) * 2 * scaleFactor;
+        const skewExpansion = Math.abs(skewTan * totalTextHeight);
+        const extraMarginCanvas = 15 * scaleFactor + skewExpansion; 
+        const dynamicPadding = maxGlowBlurCanvas + maxOutlineCanvas + extraMarginCanvas;
+
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
@@ -616,12 +682,11 @@ applyBtn.addEventListener('click', () => {
         ctx.letterSpacing = `${scaledSpacing}px`;
         ctx.textBaseline = 'top'; 
 
-        const weightValue = parseInt(currentWeight);
+        let weightStroke = 0;
         if (weightValue > 400) {
-            ctx.lineWidth = fontSize * ((weightValue - 400) / 500) * 0.04;
-            ctx.lineJoin = 'round';
-            ctx.lineCap = 'round';
+            weightStroke = fontSize * ((weightValue - 400) / 500) * 0.04;
         }
+        const scaledOutlineThickness = parseInt(outlineThickness) * scaleFactor;
 
         let xPos = dynamicPadding;
         if (currentAlignment === 'center') {
@@ -635,7 +700,11 @@ applyBtn.addEventListener('click', () => {
         }
 
         let yPos = dynamicPadding;
+        
+        const textColor = `hsl(${currentHue}, 100%, ${currentBrightness}%)`;
+        const outColor = `hsl(${outlineHue}, 100%, ${outlineBrightness}%)`;
 
+        // 1. Glow
         if (glowOpacity > 0 && glowSize > 0) {
             const a = glowOpacity / 100;
             let blurMax = parseInt(glowSize) * scaleFactor;
@@ -656,30 +725,66 @@ applyBtn.addEventListener('click', () => {
                 
                 lines.forEach((line, i) => {
                     let yPosLine = yPos + (i * lineHeight);
-                    if (weightValue > 400) {
-                        ctx.strokeStyle = `hsl(${currentHue}, 100%, ${currentBrightness}%)`;
-                        ctx.strokeText(line, xPos, yPosLine);
+                    ctx.save();
+                    ctx.translate(xPos, yPosLine);
+                    ctx.transform(1, 0, skewTan, 1, 0, 0);
+                    
+                    if (outlineThickness > 0) {
+                        ctx.lineJoin = 'round';
+                        ctx.lineWidth = (scaledOutlineThickness * 2) + weightStroke;
+                        ctx.strokeStyle = outColor;
+                        ctx.strokeText(line, 0, 0);
+                    } else if (weightValue > 400) {
+                        ctx.lineJoin = 'round';
+                        ctx.lineWidth = weightStroke;
+                        ctx.strokeStyle = textColor;
+                        ctx.strokeText(line, 0, 0);
                     }
-                    ctx.fillStyle = `hsl(${currentHue}, 100%, ${currentBrightness}%)`;
-                    ctx.fillText(line, xPos, yPosLine);
+                    ctx.fillStyle = textColor;
+                    ctx.fillText(line, 0, 0);
+                    
+                    ctx.restore();
                 });
             });
-            
             ctx.shadowColor = "transparent";
             ctx.shadowBlur = 0;
         }
 
-        ctx.fillStyle = `hsl(${currentHue}, 100%, ${currentBrightness}%)`;
+        // 2. Outline Layer
+        if (outlineThickness > 0) {
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.lineWidth = (scaledOutlineThickness * 2) + weightStroke;
+            ctx.strokeStyle = outColor;
+            lines.forEach((line, i) => {
+                let yPosLine = yPos + (i * lineHeight);
+                ctx.save();
+                ctx.translate(xPos, yPosLine);
+                ctx.transform(1, 0, skewTan, 1, 0, 0);
+                ctx.strokeText(line, 0, 0);
+                ctx.restore();
+            });
+        }
+
+        // 3. Weight & Fill Layer
+        ctx.fillStyle = textColor;
         if (weightValue > 400) {
-            ctx.strokeStyle = ctx.fillStyle;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.lineWidth = weightStroke;
+            ctx.strokeStyle = textColor;
         }
 
         lines.forEach((line, i) => {
             let yPosLine = yPos + (i * lineHeight);
+            ctx.save();
+            ctx.translate(xPos, yPosLine);
+            ctx.transform(1, 0, skewTan, 1, 0, 0);
             if (weightValue > 400) {
-                ctx.strokeText(line, xPos, yPosLine);
+                ctx.strokeText(line, 0, 0);
             }
-            ctx.fillText(line, xPos, yPosLine);
+            ctx.fillText(line, 0, 0);
+            ctx.restore();
         });
 
         generatedDataUrl = canvas.toDataURL("image/png");
@@ -700,7 +805,7 @@ applyBtn.addEventListener('click', () => {
         }
         previewImg.src = generatedDataUrl;
 
-        if (parseInt(currentBrightness) < 30) {
+        if (parseInt(currentBrightness) < 30 && parseInt(outlineBrightness) < 30 && glowOpacity == 0) {
             previewImg.style.backgroundColor = '#ffffff';
         } else {
             previewImg.style.backgroundColor = 'rgba(0,0,0,0.2)'; 
@@ -737,5 +842,5 @@ confirmDownloadBtn.addEventListener('click', (e) => {
 
 updateSlider(currentIndex);
 updateTextColor();
-updateWeightDOM();
+updateStrokeDOM();
 updateGlowDOM();
