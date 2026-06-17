@@ -138,7 +138,7 @@ const translations = {
         size: "Розмір",
         searchPlaceholder: "Назва шрифту...",
         color: "Колір",
-        weight: "Жирність",
+        weight: "Жирность",
         outline: "Обведення",
         skew: "Нахил",
         thickness: "Товщина",
@@ -901,7 +901,64 @@ applyBtn.addEventListener('click', () => {
             ctx.restore();
         });
 
-        generatedDataUrl = canvas.toDataURL("image/png");
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imgData.data;
+        const width = canvas.width;
+        const height = canvas.height;
+        let minX = width, minY = height, maxX = -1, maxY = -1;
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                if (data[(y * width + x) * 4 + 3] > 0) {
+                    minY = y;
+                    break;
+                }
+            }
+            if (minY !== height) break;
+        }
+
+        if (minY !== height) {
+            for (let y = height - 1; y >= minY; y--) {
+                for (let x = 0; x < width; x++) {
+                    if (data[(y * width + x) * 4 + 3] > 0) {
+                        maxY = y;
+                        break;
+                    }
+                }
+                if (maxY !== -1) break;
+            }
+
+            for (let x = 0; x < width; x++) {
+                for (let y = minY; y <= maxY; y++) {
+                    if (data[(y * width + x) * 4 + 3] > 0) {
+                        minX = x;
+                        break;
+                    }
+                }
+                if (minX !== width) break;
+            }
+
+            for (let x = width - 1; x >= minX; x--) {
+                for (let y = minY; y <= maxY; y++) {
+                    if (data[(y * width + x) * 4 + 3] > 0) {
+                        maxX = x;
+                        break;
+                    }
+                }
+                if (maxX !== -1) break;
+            }
+
+            const pad = 15;
+            const finalCanvas = document.createElement('canvas');
+            finalCanvas.width = (maxX - minX + 1) + pad * 2;
+            finalCanvas.height = (maxY - minY + 1) + pad * 2;
+            const finalCtx = finalCanvas.getContext('2d');
+            
+            finalCtx.drawImage(canvas, minX, minY, maxX - minX + 1, maxY - minY + 1, pad, pad, maxX - minX + 1, maxY - minY + 1);
+            generatedDataUrl = finalCanvas.toDataURL("image/png");
+        } else {
+            generatedDataUrl = canvas.toDataURL("image/png");
+        }
 
         const modalBox = downloadModal.querySelector('div');
         
@@ -956,18 +1013,31 @@ confirmDownloadBtn.addEventListener('click', (e) => {
     document.body.removeChild(link);
 });
 
+function dataURItoBlob(dataURI) {
+    const byteString = atob(dataURI.split(',')[1]);
+    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
+}
+
 copyImgBtn.addEventListener('click', async () => {
     if (!generatedDataUrl) return;
     try {
-        const response = await fetch(generatedDataUrl);
-        const blob = await response.blob();
+        const blob = dataURItoBlob(generatedDataUrl);
         const item = new ClipboardItem({ 'image/png': blob });
+        
         await navigator.clipboard.write([item]);
+        
         copyImgBtn.textContent = translations[currentLang].copied;
         setTimeout(() => {
             copyImgBtn.textContent = translations[currentLang].modalCopy;
         }, 2000);
     } catch (err) {
+        console.error(err);
         copyImgBtn.textContent = translations[currentLang].copyError;
         setTimeout(() => {
             copyImgBtn.textContent = translations[currentLang].modalCopy;
